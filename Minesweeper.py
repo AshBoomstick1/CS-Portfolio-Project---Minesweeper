@@ -3,26 +3,73 @@ import random
 num_of_bombs = 8
 num_of_selected_bombs = 0
 
+
 class Tile:
-    def __init__(self, position_x, position_y, is_bomb = False, num_of_surrounding_bombs = 0):
+    def __init__(self, position_x, position_y, is_bomb = False, num_of_surrounding_bombs = 0, is_covered = True):
         self.position_x = position_x
         self.position_y = position_y
         self.is_bomb = is_bomb
         self.num_of_surrounding_bombs = num_of_surrounding_bombs
+        self.is_covered = is_covered
     def __repr__(self):
-        #return "This tile is at {x}, {y}.".format(x=self.position_x, y=self.position_y)
         bomb_count = 1
-        if self.is_bomb == True:
-            return "BOOM"
+        if self.is_covered == False:
+            if self.is_bomb == True:
+                return "X"
+            else:
+                for tile in surrounding_tiles[self]:
+                    if tile.is_bomb:
+                        bomb_count += 1
+                return str(bomb_count - 1)
         else:
-            for tile in surrounding_tiles[self]:
-                if tile.is_bomb:
-                    bomb_count += 1
-            return str(bomb_count - 1)
+            return " "
     def select_bombs(self):
         if num_of_selected_bombs < 8:
             if random.randint(1, 100) < 30:
                 self.is_bomb = True
+    def uncover(self):
+        if self.is_bomb == True:
+            print("YOU LOSE")
+        else:
+            self.is_covered = False
+            board = """
+   1  2  3  4  5
+1 [{tile1}][{tile2}][{tile3}][{tile4}][{tile5}]
+2 [{tile6}][{tile7}][{tile8}][{tile9}][{tile10}]
+3 [{tile11}][{tile12}][{tile13}][{tile14}][{tile15}]
+4 [{tile16}][{tile17}][{tile18}][{tile19}][{tile20}]
+5 [{tile21}][{tile22}][{tile23}][{tile24}][{tile25}]
+""".format(tile1=tile1,
+  tile2=tile2, 
+  tile3=tile3,
+  tile4=tile4,
+  tile5=tile5,
+  tile6=tile6,
+  tile7=tile7, 
+  tile8=tile8,
+  tile9=tile9,
+  tile10=tile10,
+  tile11=tile11,
+  tile12=tile12,
+  tile13=tile13,
+  tile14=tile14,
+  tile15=tile15,
+  tile16=tile16,
+  tile17=tile17,
+  tile18=tile18,
+  tile19=tile19,
+  tile20=tile20,
+  tile21=tile21,
+  tile22=tile22,
+  tile23=tile23,
+  tile24=tile24,
+  tile25=tile25)
+            print(board)
+            new_pick()
+
+            
+
+
 
 tile1 = Tile(1, 1)
 tile2 = Tile(1, 2)
@@ -50,13 +97,7 @@ tile23 = Tile(5, 3)
 tile24 = Tile(5, 4)
 tile25 = Tile(5, 5)
 
-board = """
-[1]: [{tile1}][{tile2}][{tile3}][{tile4}][{tile5}]
-:[2]: [{tile6}][{tile7}][{tile8}][{tile9}][{tile10}]
-:[3]: [{tile11}][tile12][{tile13}][{tile14}][{tile15}]
-:[4]: [{tile16}][{tile17}][{tile18}][{tile19}][{tile20}]
-:[5]: [{tile21}][{tile22}][{tile23}][{tile24}][{tile25}]
-"""
+
 
 tile_list = [
          tile1,tile2,tile3,tile4,tile5,
@@ -103,4 +144,50 @@ for tile in tile_list:
     else:
         print(str(tile) + ": " + str(tile_list.index(tile) + 1))
 
+board = """
+   1  2  3  4  5
+1 [{tile1}][{tile2}][{tile3}][{tile4}][{tile5}]
+2 [{tile6}][{tile7}][{tile8}][{tile9}][{tile10}]
+3 [{tile11}][{tile12}][{tile13}][{tile14}][{tile15}]
+4 [{tile16}][{tile17}][{tile18}][{tile19}][{tile20}]
+5 [{tile21}][{tile22}][{tile23}][{tile24}][{tile25}]
+""".format(tile1=tile1,
+  tile2=tile2, 
+  tile3=tile3,
+  tile4=tile4,
+  tile5=tile5,
+  tile6=tile6,
+  tile7=tile7, 
+  tile8=tile8,
+  tile9=tile9,
+  tile10=tile10,
+  tile11=tile11,
+  tile12=tile12,
+  tile13=tile13,
+  tile14=tile14,
+  tile15=tile15,
+  tile16=tile16,
+  tile17=tile17,
+  tile18=tile18,
+  tile19=tile19,
+  tile20=tile20,
+  tile21=tile21,
+  tile22=tile22,
+  tile23=tile23,
+  tile24=tile24,
+  tile25=tile25)
+
+def new_pick():
+    input_cord_x = input("Enter the X cord of the tile you want to uncover: ")
+    input_cord_y = input("Enter the Y cord of the tile you want to uncover: ")
+    if int(input_cord_x) > 5 or int(input_cord_x) < 0:
+        input_cord_x = input("Enter a number between 0 and 6 as your X cord: ") 
+        print(input_cord_x)       
+    if int(input_cord_y) > 5 or int(input_cord_y) < 0:
+        input_cord_y = input("Enter a number between 0 and 6 as your Y cord: ")
+    for tile in tile_list:
+        if tile.position_x == int(input_cord_x) and tile.position_y == int(input_cord_y):
+            tile.uncover()
+
 print(board)
+new_pick()
