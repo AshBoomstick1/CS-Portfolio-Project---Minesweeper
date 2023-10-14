@@ -2,6 +2,7 @@ import random
 
 num_of_bombs = 8
 num_of_selected_bombs = 0
+
 class Tile:
     def __init__(self, position_x, position_y, is_bomb = False, num_of_surrounding_bombs = 0):
         self.position_x = position_x
@@ -9,14 +10,15 @@ class Tile:
         self.is_bomb = is_bomb
         self.num_of_surrounding_bombs = num_of_surrounding_bombs
     def __repr__(self):
-            #return "This tile is at {x}, {y}.".format(x=self.position_x, y=self.position_y)
+        #return "This tile is at {x}, {y}.".format(x=self.position_x, y=self.position_y)
+        bomb_count = 1
         if self.is_bomb == True:
             return "BOOM"
         else:
-            for tile in surrounding_tiles(self):
+            for tile in surrounding_tiles[self]:
                 if tile.is_bomb:
                     bomb_count += 1
-            return bomb_count
+            return str(bomb_count - 1)
     def select_bombs(self):
         if num_of_selected_bombs < 8:
             if random.randint(1, 100) < 30:
@@ -64,14 +66,41 @@ tile_list = [
          tile21,tile22,tile23,tile24,tile25
         ]
 
-surrounding_tiles = {tile1: [tile2, tile7, tile6], tile2: [tile1, tile3, tile6, tile7, tile8], tile3:[tile2, tile4, tile7, tile8, tile9], tile4: [tile3, tile5, tile8, tile9, tile10], tile5: [tile4, tile9, tile10], tile6: [tile1, tile2, tile7, tile11, tile12, tile13], tile7: [tile1, tile2, tile3, tile6, tile8, tile11, tile12, tile13]}
+surrounding_tiles = {tile1: [tile2, tile7, tile6], 
+                     tile2: [tile1, tile3, tile6, tile7, tile8], 
+                     tile3:[tile2, tile4, tile7, tile8, tile9], 
+                     tile4: [tile3, tile5, tile8, tile9, tile10], 
+                     tile5: [tile4, tile9, tile10], 
+                     tile6: [tile1, tile2, tile7, tile11, tile12],
+                     tile7: [tile1, tile2, tile3, tile6, tile8, tile11, tile12, tile13], 
+                     tile8: [tile2, tile3, tile4, tile7, tile9, tile12, tile13, tile14], 
+                     tile9: [tile3, tile4, tile5, tile8, tile10, tile13, tile14, tile15], 
+                     tile10: [tile4, tile5, tile9, tile14, tile15], 
+                     tile11: [tile6, tile7, tile12, tile16, tile17], 
+                     tile12: [tile6, tile7, tile8, tile11, tile13, tile16, tile17, tile18], 
+                     tile13: [tile7, tile8, tile9, tile12, tile14, tile17, tile18, tile19],
+                     tile14: [tile8, tile9, tile10, tile13, tile15, tile18, tile19, tile20],
+                     tile15: [tile9, tile10, tile14, tile19, tile20],
+                     tile16: [tile11, tile12, tile17, tile21, tile22],
+                     tile17: [tile11, tile12, tile13, tile16, tile18, tile21, tile22, tile23],
+                     tile18: [tile12, tile13, tile14, tile17, tile18, tile22, tile23, tile24],
+                     tile19: [tile13, tile14, tile15, tile18, tile20, tile23, tile24, tile25],
+                     tile20: [tile14, tile15, tile19, tile24, tile25],
+                     tile21: [tile16, tile17, tile22],
+                     tile22: [tile16, tile17, tile18, tile21, tile23],
+                     tile23: [tile17, tile18, tile19, tile22, tile24],
+                     tile24: [tile18, tile19, tile20, tile23, tile25],
+                     tile25: [tile19, tile20, tile24]}
 
 for tile in tile_list:
     tile.select_bombs()
 for tile in tile_list:
     if tile.is_bomb == True:
+        print("BOOM" + ": " + str(tile_list.index(tile) + 1))
+for tile in tile_list:
+    if tile.is_bomb == True:
         print(str(tile.position_x) + ", " + str(tile.position_y) + "BOOM")
     else:
-        print(str(tile.position_x) + ", " + str(tile.position_y) + ": " + str(tile))
+        print(str(tile) + ": " + str(tile_list.index(tile) + 1))
 
 print(board)
