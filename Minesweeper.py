@@ -37,7 +37,9 @@ class Tile:
     def uncover(self):
         global turn
         turn += 1
-        input_flag = input("Add flag or uncover tile? (1 for tile, 0 for flag)")
+        input_flag = input("Add flag or uncover tile? (1 for tile, 0 for flag):")
+        if type(input_flag) != str:
+            input_flag = input("Type 1 to uncover tile. Type 2 to place flag:")
         if int(input_flag) == 1:
             global placing_flag
             placing_flag = True
@@ -169,10 +171,9 @@ def new_pick():
     global turn
     if turn != 25:
         input_cord_x = input("Enter the X cord of the tile you want to uncover: ")
-        input_cord_y = input("Enter the Y cord of the tile you want to uncover: ")
         if input_cord_x == "" or int(input_cord_x) < 0 or int(input_cord_x) > 5:
             input_cord_x = input("Enter a number between 0 and 6 as your X cord: ") 
-            print(input_cord_x)       
+        input_cord_y = input("Enter the Y cord of the tile you want to uncover: ")  
         if input_cord_y == "" or int(input_cord_y) < 0 or int(input_cord_y) > 5:
             input_cord_y = input("Enter a number between 0 and 6 as your Y cord: ")
         for tile in tile_list:
