@@ -1,6 +1,6 @@
 import random
 
-placing_flag = 0
+placing_flag = False
 num_of_bombs = 4
 turn = 0
 class Tile:
@@ -15,9 +15,14 @@ class Tile:
         global placing_flag
         if self.is_covered == False:
             if self.is_bomb == True:
-                return "X"
+                if placing_flag == True:
+                    return "X"
+                else:
+                    print("YOU LOSE")
+                    print("Your Score is: " + str(turn - 1))
+                    exit()
             else:
-                if placing_flag == 0:
+                if placing_flag == True:
                     for tile in surrounding_tiles[self]:
                         if tile.is_bomb:
                             bomb_count += 1
@@ -25,6 +30,7 @@ class Tile:
                 else:
                     print("YOU LOSE")
                     print("Your Score is: " + str(turn - 1))
+                    exit()
         else:
             return " "
         
@@ -34,14 +40,15 @@ class Tile:
         input_flag = input("Add flag or uncover tile? (1 for tile, 0 for flag)")
         if int(input_flag) == 1:
             global placing_flag
-            placing_flag = 0
+            placing_flag = True
         else:
-            placing_flag = 1
+            placing_flag = False
         if self.is_bomb == True:
-            if placing_flag == 0:          
+            if placing_flag == True:          
                 print("YOU LOSE")
                 print("Your Score is: " + str(turn - 1))
-            if placing_flag == 1:
+                exit()
+            if placing_flag == True:
                 self.is_covered = False
                 board = """
    1  2  3  4  5
