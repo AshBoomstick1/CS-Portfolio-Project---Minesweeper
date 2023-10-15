@@ -2,6 +2,7 @@ import random
 
 placing_flag = 0
 num_of_bombs = 4
+turn = 0
 class Tile:
     def __init__(self, position_x, position_y, is_bomb = False, num_of_surrounding_bombs = 0, is_covered = True):
         self.position_x = position_x
@@ -11,28 +12,35 @@ class Tile:
         self.is_covered = is_covered
     def __repr__(self):
         bomb_count = 1
+        global placing_flag
         if self.is_covered == False:
             if self.is_bomb == True:
                 return "X"
             else:
-                for tile in surrounding_tiles[self]:
-                    if tile.is_bomb:
-                        bomb_count += 1
-                return str(bomb_count - 1)
+                if placing_flag == 0:
+                    for tile in surrounding_tiles[self]:
+                        if tile.is_bomb:
+                            bomb_count += 1
+                    return str(bomb_count - 1)
+                else:
+                    print("YOU LOSE")
+                    print("Your Score is: " + str(turn - 1))
         else:
             return " "
+        
     def uncover(self):
+        global turn
+        turn += 1
         input_flag = input("Add flag or uncover tile? (1 for tile, 0 for flag)")
         if int(input_flag) == 1:
+            global placing_flag
             placing_flag = 0
-            print(placing_flag)
         else:
             placing_flag = 1
-            print(placing_flag)
         if self.is_bomb == True:
-            if placing_flag == 0: 
-                print(placing_flag)           
+            if placing_flag == 0:          
                 print("YOU LOSE")
+                print("Your Score is: " + str(turn - 1))
             if placing_flag == 1:
                 self.is_covered = False
                 board = """
@@ -105,7 +113,6 @@ class Tile:
   tile25=tile25)
             print(board)
             new_pick()
-            
 
 
 
@@ -170,24 +177,17 @@ surrounding_tiles = {tile1: [tile2, tile7, tile6],
                      tile23: [tile17, tile18, tile19, tile22, tile24],
                      tile24: [tile18, tile19, tile20, tile23, tile25],
                      tile25: [tile19, tile20, tile24]}
-
 selected_bomb_count = 0
-
 def select_bomb():
+    global selected_bomb_count
     new_bomb = tile_list[random.randint(0, 24)]
     if new_bomb.is_bomb == True:
-        selected_bomb_count -= 1
+        selected_bomb_count = selected_bomb_count - 1
     new_bomb.is_bomb = True
 
 while selected_bomb_count < num_of_bombs:
     select_bomb()
     selected_bomb_count += 1
-
-for tile in tile_list:
-    if tile.is_bomb == True:
-        print(str(tile.position_x) + ", " + str(tile.position_y))
-    else:
-        print(str(tile) + ": " + str(tile_list.index(tile) + 1))
 
 board = """
    1  2  3  4  5
@@ -221,8 +221,9 @@ board = """
   tile23=tile23,
   tile24=tile24,
   tile25=tile25)
-
 def new_pick():
+    global turn
+    if turn != 25:
         input_cord_x = input("Enter the X cord of the tile you want to uncover: ")
         input_cord_y = input("Enter the Y cord of the tile you want to uncover: ")
         if input_cord_x == "" or int(input_cord_x) < 0 or int(input_cord_x) > 5:
@@ -233,7 +234,10 @@ def new_pick():
         for tile in tile_list:
             if tile.position_y == int(input_cord_x) and tile.position_x == int(input_cord_y):
                 tile.uncover()
+    else:
+        print("YOU WIN!")
 
-new_board = board
-print(new_board)
+
+
+print(board)
 new_pick()
