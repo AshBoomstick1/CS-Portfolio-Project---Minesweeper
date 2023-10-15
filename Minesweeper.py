@@ -50,75 +50,11 @@ class Tile:
                 exit()
             if placing_flag == True:
                 self.is_covered = False
-                board = """
-   1  2  3  4  5
-1 [{tile1}][{tile2}][{tile3}][{tile4}][{tile5}]
-2 [{tile6}][{tile7}][{tile8}][{tile9}][{tile10}]
-3 [{tile11}][{tile12}][{tile13}][{tile14}][{tile15}]
-4 [{tile16}][{tile17}][{tile18}][{tile19}][{tile20}]
-5 [{tile21}][{tile22}][{tile23}][{tile24}][{tile25}]
-""".format(tile1=tile1,
-  tile2=tile2, 
-  tile3=tile3,
-  tile4=tile4,
-  tile5=tile5,
-  tile6=tile6,
-  tile7=tile7, 
-  tile8=tile8,
-  tile9=tile9,
-  tile10=tile10,
-  tile11=tile11,
-  tile12=tile12,
-  tile13=tile13,
-  tile14=tile14,
-  tile15=tile15,
-  tile16=tile16,
-  tile17=tile17,
-  tile18=tile18,
-  tile19=tile19,
-  tile20=tile20,
-  tile21=tile21,
-  tile22=tile22,
-  tile23=tile23,
-  tile24=tile24,
-  tile25=tile25)
-                print(board)
+                print(show_board())
                 new_pick()
         else:
             self.is_covered = False
-            board = """
-   1  2  3  4  5
-1 [{tile1}][{tile2}][{tile3}][{tile4}][{tile5}]
-2 [{tile6}][{tile7}][{tile8}][{tile9}][{tile10}]
-3 [{tile11}][{tile12}][{tile13}][{tile14}][{tile15}]
-4 [{tile16}][{tile17}][{tile18}][{tile19}][{tile20}]
-5 [{tile21}][{tile22}][{tile23}][{tile24}][{tile25}]
-""".format(tile1=tile1,
-  tile2=tile2, 
-  tile3=tile3,
-  tile4=tile4,
-  tile5=tile5,
-  tile6=tile6,
-  tile7=tile7, 
-  tile8=tile8,
-  tile9=tile9,
-  tile10=tile10,
-  tile11=tile11,
-  tile12=tile12,
-  tile13=tile13,
-  tile14=tile14,
-  tile15=tile15,
-  tile16=tile16,
-  tile17=tile17,
-  tile18=tile18,
-  tile19=tile19,
-  tile20=tile20,
-  tile21=tile21,
-  tile22=tile22,
-  tile23=tile23,
-  tile24=tile24,
-  tile25=tile25)
-            print(board)
+            print(show_board())
             new_pick()
 
 
@@ -195,8 +131,8 @@ def select_bomb():
 while selected_bomb_count < num_of_bombs:
     select_bomb()
     selected_bomb_count += 1
-
-board = """
+def show_board():
+    board = """
    1  2  3  4  5
 1 [{tile1}][{tile2}][{tile3}][{tile4}][{tile5}]
 2 [{tile6}][{tile7}][{tile8}][{tile9}][{tile10}]
@@ -228,6 +164,7 @@ board = """
   tile23=tile23,
   tile24=tile24,
   tile25=tile25)
+    return board
 def new_pick():
     global turn
     if turn != 25:
@@ -246,5 +183,5 @@ def new_pick():
 
 
 
-print(board)
+print(show_board())
 new_pick()
