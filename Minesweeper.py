@@ -25,7 +25,7 @@ class Tile:
                 else:
                     if current_tile_if_bomb == self.is_bomb:
                         print(self.position_x, self.position_y)
-                        print("YOU LOSE: UNCOVERED MINE 1")
+                        print("YOU LOSE: UNCOVERED MINE")
                         print("Your Score is: " + str(uncovered_count - 1))
                         for tile in tile_list:
                             if tile.is_bomb == True:
@@ -62,7 +62,7 @@ class Tile:
         global turn
         turn += 1
         input_flag = input("Add flag or uncover tile? (1 for tile, 0 for flag):")
-        if type(input_flag) != str:
+        while type(input_flag) != str:
             input_flag = input("Type 1 to uncover tile. Type 2 to place flag:")
         if int(input_flag) == 1:
             global placing_flag
@@ -77,7 +77,7 @@ class Tile:
         current_tile_if_bomb = self.is_bomb
         if self.is_bomb == True:
             if placing_flag == False:          
-                print("YOU LOSE: UNCOVERED MINE 2")
+                print("YOU LOSE: UNCOVERED MINE")
                 print("Your Score is: " + str(uncovered_count ))
                 for tile in tile_list:
                     if tile.is_bomb == True:
@@ -250,10 +250,10 @@ def new_pick():
         print("YOU WON IN {turn} TURNS".format(turn=turn))
     else:
         input_cord_x = input("Enter the X cord of the tile you want to uncover: ")
-        if type(input_cord_x) != str or input_cord_x == "" or int(input_cord_x) < 0 or int(input_cord_x) > 5:
+        while type(input_cord_x) != str or input_cord_x == "" or int(input_cord_x) < 0 or int(input_cord_x) > 5:
             input_cord_x = input("Enter a number between 0 and 6 as your X cord: ") 
         input_cord_y = input("Enter the Y cord of the tile you want to uncover: ")  
-        if input_cord_y == "" or int(input_cord_y) < 0 or int(input_cord_y) > 5:
+        while input_cord_y == "" or int(input_cord_y) < 0 or int(input_cord_y) > 5:
             input_cord_y = input("Enter a number between 0 and 6 as your Y cord: ")
         for tile in tile_list:
             if tile.position_y == int(input_cord_x) and tile.position_x == int(input_cord_y):
