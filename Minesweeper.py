@@ -104,6 +104,10 @@ class Tile:
                                         surrounding_tiles_list_4 = find_surounding_tiles(tile3)
                                         for tile4 in surrounding_tiles_list_4:
                                             tile4.is_covered = False
+                                            if is_tile_0(tile4):
+                                                surrounding_tiles_list_5 = find_surounding_tiles(tile4)
+                                                for tile5 in surrounding_tiles_list_5:
+                                                    tile5.is_covered = False
             print(show_board())
             new_pick()
 
@@ -250,10 +254,10 @@ def new_pick():
         print("YOU WON IN {turn} TURNS".format(turn=turn))
     else:
         input_cord_x = input("Enter the X cord of the tile you want to uncover: ")
-        while type(input_cord_x) != str or input_cord_x == "" or int(input_cord_x) < 0 or int(input_cord_x) > 5:
+        while type(input_cord_x) != str or input_cord_x == "" or int(input_cord_x) < 1 or int(input_cord_x) > 5:
             input_cord_x = input("Enter a number between 0 and 6 as your X cord: ") 
         input_cord_y = input("Enter the Y cord of the tile you want to uncover: ")  
-        while input_cord_y == "" or int(input_cord_y) < 0 or int(input_cord_y) > 5:
+        while input_cord_y == "" or int(input_cord_y) < 1 or int(input_cord_y) > 5:
             input_cord_y = input("Enter a number between 0 and 6 as your Y cord: ")
         for tile in tile_list:
             if tile.position_y == int(input_cord_x) and tile.position_x == int(input_cord_y):
