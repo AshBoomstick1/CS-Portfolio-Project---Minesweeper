@@ -4,25 +4,35 @@ placing_flag = False
 num_of_bombs = 4
 turn = 0
 class Tile:
-    def __init__(self, position_x, position_y, is_bomb = False, num_of_surrounding_bombs = 0, is_covered = True):
+    def __init__(self, position_x, position_y, is_bomb = False, num_of_surrounding_bombs = 0, is_covered = True, is_flagged = False):
         self.position_x = position_x
         self.position_y = position_y
         self.is_bomb = is_bomb
         self.num_of_surrounding_bombs = num_of_surrounding_bombs
         self.is_covered = is_covered
+        self.is_flagged = is_flagged
     def __repr__(self):
         bomb_count = 1
         global placing_flag
+        global current_tile_x
+        global current_tile_y
+        global current_tile_if_bomb
         if self.is_covered == False:
             if self.is_bomb == True:
-                print("IT GOT HERE")
                 if placing_flag == True:
-                    print(placing_flag)
+                    self.is_flagged = True
                     return "X"
                 else:
-                    print("YOU LOSE: UNCOVERED MINE")
-                    print("Your Score is: " + str(uncovered_count - 1))
-                    exit()
+                    if current_tile_if_bomb == self.is_bomb:
+                        print(self.position_x, self.position_y)
+                        print("YOU LOSE: UNCOVERED MINE 1")
+                        print("Your Score is: " + str(uncovered_count - 1))
+                        for tile in tile_list:
+                            if tile.is_bomb == True:
+                                print("Mines were at: " + str(tile.position_y) + ", " + str(tile.position_x))
+                        exit()
+                    else:
+                        return "X"
             else:
                 if placing_flag == False:
                     for tile in surrounding_tiles[self]:
@@ -30,10 +40,20 @@ class Tile:
                             bomb_count += 1
                     return str(bomb_count - 1)
                 else:
-                    print(self.is_bomb)
-                    print("YOU LOSE: FLAGGED CLEAR TILE")
-                    print("Your Score is: " + str(uncovered_count))
-                    exit()
+                    if self.position_x == current_tile_x and self.position_y == current_tile_y and self.is_bomb == True:
+                        print(str(self.is_bomb), str(self.position_x), str(self.position_y))
+                        print("YOU LOSE: FLAGGED CLEAR TILE")
+                        print("Your Score is: " + str(uncovered_count))
+                        for tile in tile_list:
+                            if tile.is_bomb == True:
+                                print("Mines were at: " + str(tile.position_y) + ", " + str(tile.position_x))
+                        exit()
+                    else:
+                        for tile in surrounding_tiles[self]:
+                            if tile.is_bomb:
+                                bomb_count += 1
+                        return str(bomb_count - 1)
+
         else:
             return " "
         
@@ -49,13 +69,20 @@ class Tile:
             placing_flag = False
         else:
             placing_flag = True
+        global current_tile_x
+        global current_tile_y
+        global current_tile_if_bomb
+        current_tile_x = self.position_x
+        current_tile_y = self.position_y
+        current_tile_if_bomb = self.is_bomb
         if self.is_bomb == True:
-            print("YEP!")
             if placing_flag == False:          
-                print("YOU LOSE: UNCOVERED MINE")
+                print("YOU LOSE: UNCOVERED MINE 2")
                 print("Your Score is: " + str(uncovered_count ))
+                for tile in tile_list:
+                    if tile.is_bomb == True:
+                        print("Mines were at: " + str(tile.position_y) + ", " + str(tile.position_x))
             if placing_flag == True:
-                print("YES" + self.is_bomb)
                 self.is_covered = False
                 print(show_board())
                 new_pick()
@@ -152,7 +179,7 @@ surrounding_tiles = {tile1: [tile2, tile7, tile6],
                      tile15: [tile9, tile10, tile14, tile19, tile20],
                      tile16: [tile11, tile12, tile17, tile21, tile22],
                      tile17: [tile11, tile12, tile13, tile16, tile18, tile21, tile22, tile23],
-                     tile18: [tile12, tile13, tile14, tile17, tile18, tile22, tile23, tile24],
+                     tile18: [tile12, tile13, tile14, tile17, tile19, tile22, tile23, tile24],
                      tile19: [tile13, tile14, tile15, tile18, tile20, tile23, tile24, tile25],
                      tile20: [tile14, tile15, tile19, tile24, tile25],
                      tile21: [tile16, tile17, tile22],
@@ -212,21 +239,13 @@ def show_board():
 
 
 def new_pick():
-    for tile in tile_list:
-        if tile.is_bomb == True:
-            print("BOOM: " + str(tile.position_y) + ", " + str(tile.position_x))
     global uncovered_count
     global turn
     uncovered_count = 0
-    covered_bomb_count = 0
-    for tile in tile_list:
-        if tile.is_bomb == True:
-            if tile.is_covered == True:
-                covered_bomb_count += 1
     for tile in tile_list:
         if tile.is_covered == False:
             uncovered_count += 1
-    if uncovered_count == 25 or uncovered_count == 25 - num_of_bombs or covered_bomb_count == 0:
+    if uncovered_count == 25:
         print("YOU WIN!")
         print("YOU WON IN {turn} TURNS".format(turn=turn))
     else:
