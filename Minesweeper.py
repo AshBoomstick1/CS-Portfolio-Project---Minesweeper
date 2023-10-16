@@ -1,8 +1,8 @@
 import random
 
 placing_flag = False
-num_of_bombs = 4
-turn = 0
+num_of_bombs = int(input("\nNumber of mines:"))
+turn = -1
 class Tile:
     def __init__(self, position_x, position_y, is_bomb = False, num_of_surrounding_bombs = 0, is_covered = True, is_flagged = False):
         self.position_x = position_x
@@ -40,7 +40,7 @@ class Tile:
                             bomb_count += 1
                     return str(bomb_count - 1)
                 else:
-                    if self.position_x == current_tile_x and self.position_y == current_tile_y and self.is_bomb == True:
+                    if self.position_x == current_tile_x and self.position_y == current_tile_y and self.is_bomb == False:
                         print(str(self.is_bomb), str(self.position_x), str(self.position_y))
                         print("YOU LOSE: FLAGGED CLEAR TILE")
                         print("Your Score is: " + str(uncovered_count))
@@ -60,20 +60,20 @@ class Tile:
     def uncover(self):
         global uncovered_count
         global turn
+        global current_tile_x
+        global current_tile_y
+        global current_tile_if_bomb
+        current_tile_x = self.position_x
+        current_tile_y = self.position_y
         turn += 1
-        input_flag = input("Add flag or uncover tile? (1 for tile, 0 for flag):")
-        while type(input_flag) != str:
+        input_flag = input("Add flag or uncover tile? (1 for tile, 2 for flag):")
+        while type(input_flag) != str or input_flag == "":
             input_flag = input("Type 1 to uncover tile. Type 2 to place flag:")
         if int(input_flag) == 1:
             global placing_flag
             placing_flag = False
         else:
             placing_flag = True
-        global current_tile_x
-        global current_tile_y
-        global current_tile_if_bomb
-        current_tile_x = self.position_x
-        current_tile_y = self.position_y
         current_tile_if_bomb = self.is_bomb
         if self.is_bomb == True:
             if placing_flag == False:          
@@ -196,10 +196,10 @@ def select_turn_mines():
             global selected_bomb_count
             selected_bomb_count = selected_bomb_count - 1
         new_bomb.is_bomb = True
-
     while selected_bomb_count < num_of_bombs:
-        select_bomb()
         selected_bomb_count += 1
+        select_bomb()
+        
 select_turn_mines()
 def show_board():
     board = """
@@ -237,7 +237,7 @@ def show_board():
   tile25=tile25)
     return board
 
-
+turn  += 1
 def new_pick():
     global uncovered_count
     global turn
