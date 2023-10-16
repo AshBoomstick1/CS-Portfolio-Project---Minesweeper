@@ -5,3 +5,6 @@ There are 4 mines in a 5x5 grid.
 You type the cords of the tile you want to uncover and if you want to place a flag or not. 
 Try to uncover all the unmined tiles.
 Note: You can't remove flags
+
+If you don't have python you can download it here: https://www.python.org/downloads/
+Then you can run the code in the IDE or in a code editor
