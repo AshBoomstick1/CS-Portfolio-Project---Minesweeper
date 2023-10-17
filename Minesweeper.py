@@ -3,6 +3,8 @@ import random
 placing_flag = False
 num_of_bombs = int(input("\nNumber of mines:"))
 turn = -1
+current_tile_x = 6
+current_tile_y = 6
 class Tile:
     def __init__(self, position_x, position_y, is_bomb = False, num_of_surrounding_bombs = 0, is_covered = True, is_flagged = False):
         self.position_x = position_x
@@ -61,12 +63,17 @@ class Tile:
         global uncovered_count
         global turn
         global current_tile_x
-        global current_tile_y
+        global current_tile_y 
         global current_tile_if_bomb
+        global un_cover_again
+        un_cover_again = True
         current_tile_x = self.position_x
         current_tile_y = self.position_y
+        while turn == 0 and self.is_bomb == True and un_cover_again == True:
+            self.pick_new_bomb()
+        un_cover_again = False
         turn += 1
-        input_flag = input("Add flag or uncover tile? (1 for tile, 2 for flag):")
+        input_flag = input("Add flag or uncover tile? (1 to uncover, 2 to flag):")
         while type(input_flag) != str or input_flag == "":
             input_flag = input("Type 1 to uncover tile. Type 2 to place flag:")
         if int(input_flag) == 1:
@@ -108,8 +115,33 @@ class Tile:
                                                 surrounding_tiles_list_5 = find_surounding_tiles(tile4)
                                                 for tile5 in surrounding_tiles_list_5:
                                                     tile5.is_covered = False
+                                                    if is_tile_0(tile5):
+                                                        surrounding_tiles_list_6 = find_surounding_tiles(tile5)
+                                                        for tile6 in surrounding_tiles_list_6:
+                                                            tile6.is_covered = False
+                                                            if is_tile_0(tile6):
+                                                                surrounding_tiles_list_7 = find_surounding_tiles(tile6)
+                                                                for tile7 in surrounding_tiles_list_7:
+                                                                    tile7.is_covered = False
+                                                                    if is_tile_0(tile7):
+                                                                        surrounding_tiles_list_8 = find_surounding_tiles(tile7)
+                                                                        for tile8 in surrounding_tiles_list_8:
+                                                                            tile8.is_covered = False
+                                                                            if is_tile_0(tile8):
+                                                                                surrounding_tiles_list_9 = find_surounding_tiles(tile8)
+                                                                                for tile9 in surrounding_tiles_list_9:
+                                                                                    tile9.is_covered = False
+                                                                                    if is_tile_0(tile9):
+                                                                                        surrounding_tiles_list_10 = find_surounding_tiles(tile9)
+                                                                                        for tile10 in surrounding_tiles_list_10:
+                                                                                            tile10.is_covered = False
+
             print(show_board())
             new_pick()
+
+    def pick_new_bomb(self):
+        self.is_bomb = False
+        select_turn_mines()
 
 
 def is_tile_0(tile):
@@ -128,6 +160,14 @@ def find_surounding_tiles(self):
         return_list.append(tile)
     return return_list
 
+def uncover_0_field(tile):
+    return_list = []
+    surrounding_tiles_list = find_surounding_tiles(tile)
+    for tile in surrounding_tiles_list:
+        tile.is_covered = False
+        if is_tile_0(tile):
+            return_list.append(tile)
+    return return_list
 
 
 tile1 = Tile(1, 1)
@@ -191,18 +231,17 @@ surrounding_tiles = {tile1: [tile2, tile7, tile6],
                      tile23: [tile17, tile18, tile19, tile22, tile24],
                      tile24: [tile18, tile19, tile20, tile23, tile25],
                      tile25: [tile19, tile20, tile24]}
+
 def select_turn_mines():
-    global selected_bomb_count
-    selected_bomb_count = 0
-    def select_bomb():
+    global count
+    count = 0
+    while count < num_of_bombs:
+        count += 1
         new_bomb = tile_list[random.randint(0, 24)]
         if new_bomb.is_bomb == True:
-            global selected_bomb_count
-            selected_bomb_count = selected_bomb_count - 1
+            new_bomb.pick_new_bomb
         new_bomb.is_bomb = True
-    while selected_bomb_count < num_of_bombs:
-        selected_bomb_count += 1
-        select_bomb()
+
         
 select_turn_mines()
 def show_board():
@@ -246,10 +285,14 @@ def new_pick():
     global uncovered_count
     global turn
     uncovered_count = 0
+    uncovered_tile_count = 0
     for tile in tile_list:
         if tile.is_covered == False:
             uncovered_count += 1
-    if uncovered_count == 25:
+    for tile in tile_list:
+        if tile.is_covered == False and tile.is_bomb == False:
+            uncovered_tile_count += 1
+    if uncovered_count == 25 or uncovered_tile_count == 25 - num_of_bombs:
         print("YOU WIN!")
         print("YOU WON IN {turn} TURNS".format(turn=turn))
     else:
