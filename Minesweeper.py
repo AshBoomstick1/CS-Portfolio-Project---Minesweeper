@@ -5,6 +5,10 @@ num_of_bombs = int(input("\nNumber of mines:"))
 turn = -1
 current_tile_x = 6
 current_tile_y = 6
+previous_x = 0
+previous_y = 0
+global uncover_0_count
+uncover_0_count = 0
 class Tile:
     def __init__(self, position_x, position_y, is_bomb = False, num_of_surrounding_bombs = 0, is_covered = True, is_flagged = False):
         self.position_x = position_x
@@ -28,7 +32,7 @@ class Tile:
                     if current_tile_if_bomb == self.is_bomb:
                         print(self.position_x, self.position_y)
                         print("YOU LOSE: UNCOVERED MINE")
-                        print("Your Score is: " + str(uncovered_count - 1))
+                        print("Your Score is: " + str(uncovered_count - 1 + turn))
                         for tile in tile_list:
                             if tile.is_bomb == True:
                                 print("Mines were at: " + str(tile.position_y) + ", " + str(tile.position_x))
@@ -45,7 +49,7 @@ class Tile:
                     if self.position_x == current_tile_x and self.position_y == current_tile_y and self.is_bomb == False:
                         print(str(self.is_bomb), str(self.position_x), str(self.position_y))
                         print("YOU LOSE: FLAGGED CLEAR TILE")
-                        print("Your Score is: " + str(uncovered_count))
+                        print("Your Score is: " + str(uncovered_count + turn))
                         for tile in tile_list:
                             if tile.is_bomb == True:
                                 print("Mines were at: " + str(tile.position_y) + ", " + str(tile.position_x))
@@ -72,6 +76,8 @@ class Tile:
         while turn == 0 and self.is_bomb == True and un_cover_again == True:
             self.pick_new_bomb()
         un_cover_again = False
+        if previous_x == current_tile_x and previous_y == current_tile_y:
+            turn -= 1
         turn += 1
         input_flag = input("Add flag or uncover tile? (1 to uncover, 2 to flag):")
         while type(input_flag) != str or input_flag == "":
@@ -85,7 +91,7 @@ class Tile:
         if self.is_bomb == True:
             if placing_flag == False:          
                 print("YOU LOSE: UNCOVERED MINE")
-                print("Your Score is: " + str(uncovered_count ))
+                print("Your Score is: " + str(uncovered_count + turn))
                 for tile in tile_list:
                     if tile.is_bomb == True:
                         print("Mines were at: " + str(tile.position_y) + ", " + str(tile.position_x))
@@ -161,13 +167,20 @@ def find_surounding_tiles(self):
     return return_list
 
 def uncover_0_field(tile):
+    global uncover_0_count
+    print(uncover_0_count)
+    uncover_0_count += 1
     return_list = []
     surrounding_tiles_list = find_surounding_tiles(tile)
     for tile in surrounding_tiles_list:
         tile.is_covered = False
         if is_tile_0(tile):
             return_list.append(tile)
-    return return_list
+    if uncover_0_count < 12:
+        for tile1 in return_list:
+            uncover_0_field(tile1)
+    else:
+        return return_list
 
 
 tile1 = Tile(1, 1)
@@ -235,11 +248,13 @@ surrounding_tiles = {tile1: [tile2, tile7, tile6],
 def select_turn_mines():
     global count
     count = 0
+    print(count)
     while count < num_of_bombs:
         count += 1
         new_bomb = tile_list[random.randint(0, 24)]
         if new_bomb.is_bomb == True:
             new_bomb.pick_new_bomb
+            count -= 1
         new_bomb.is_bomb = True
 
         
@@ -286,6 +301,8 @@ def new_pick():
     global turn
     uncovered_count = 0
     uncovered_tile_count = 0
+    x_input_list = [0]
+    y_input_list = [0]
     for tile in tile_list:
         if tile.is_covered == False:
             uncovered_count += 1
@@ -299,13 +316,16 @@ def new_pick():
         input_cord_x = input("Enter the X cord of the tile you want to uncover: ")
         while type(input_cord_x) != str or input_cord_x == "" or int(input_cord_x) < 1 or int(input_cord_x) > 5:
             input_cord_x = input("Enter a number between 0 and 6 as your X cord: ") 
+        x_input_list.append(input_cord_x)
+        previous_x = x_input_list[-2]
         input_cord_y = input("Enter the Y cord of the tile you want to uncover: ")  
         while input_cord_y == "" or int(input_cord_y) < 1 or int(input_cord_y) > 5:
             input_cord_y = input("Enter a number between 0 and 6 as your Y cord: ")
+        y_input_list.append(input_cord_y)
+        previous_y = y_input_list[-2]
         for tile in tile_list:
             if tile.position_y == int(input_cord_x) and tile.position_x == int(input_cord_y):
                 tile.uncover()
-
 
 
 print(show_board())
