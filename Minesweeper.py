@@ -1,5 +1,5 @@
 import random
-
+#Sets of the game
 placing_flag = 2
 can_remove_flag = input("\nDo want to be able to remove flag? (y/n): ")
 if can_remove_flag == "y":
@@ -16,6 +16,7 @@ previous_x = 0
 previous_y = 0
 global uncover_0_count
 uncover_0_count = 0
+#defines the tiles
 class Tile:
     def __init__(self, position_x, position_y, is_bomb = False, num_of_surrounding_bombs = 0, is_covered = True, is_flagged = False):
         self.position_x = position_x
@@ -24,6 +25,7 @@ class Tile:
         self.num_of_surrounding_bombs = num_of_surrounding_bombs
         self.is_covered = is_covered
         self.is_flagged = is_flagged
+    #This shows what the tiles will look like on the board
     def __repr__(self):
         global placing_flag
         global current_tile_x
@@ -31,7 +33,7 @@ class Tile:
         global current_tile_if_bomb
         if self.is_covered == False:
             if self.is_bomb == True:
-                return "X"           
+                return "X"
             else:
                 if placing_flag == 1:
                     if self.is_flagged == False:
@@ -53,27 +55,23 @@ class Tile:
                         return "X"
         else:
             return " "
-        
+    #This checks weather the tile is a bomb and flags as well as if you can remove flags.
     def uncover(self):
+        print("YYWEG")
         global uncovered_count
         global turn
         global current_tile_x
         global current_tile_y 
         global current_tile_if_bomb
         global un_cover_again
-        global current_tile
+        global tile_id
         un_cover_again = True
-        current_tile = str(self.position_y) + str(self.position_x)
+        tile_id = str(self.position_y) + str(self.position_x)
         current_tile_x = self.position_x
         current_tile_y = self.position_y
         while turn == 0 and self.is_bomb == True and un_cover_again == True:
-            print("SELECTING NEW BOMBS")
             self.pick_new_bomb()
         un_cover_again = False
-
-        if int(x_input_list[-2]) == int(current_tile_x) and int(y_input_list[-2]) == int(current_tile_y):
-            turn -= 1
-        turn += 1
 
         if can_remove_flag == False:
             input_flag = input("Add flag or uncover tile? (1 to uncover, 2 to flag):")
@@ -91,15 +89,20 @@ class Tile:
         else:
             placing_flag = 1
 
+        for tile in tile_list:
+            if tile.is_covered == False:
+                if tile.position_x == current_tile_x and tile.position_y == current_tile_y:
+                    print(show_board())
+                    new_pick()
+
+        turn += 1
+
         current_tile_if_bomb = self.is_bomb
         if self.is_bomb == True:
+            print("BOMB")
             if placing_flag == 1:         
                 print("YOU LOSE: UNCOVERED MINE")
-                print("Your Score is: " + str(uncovered_count + turn))
-                for tile in tile_list:
-                    if tile.is_bomb == True:
-                        print("Mines were at: " + str(tile.position_y) + ", " + str(tile.position_x))
-                exit()
+                end_game()
             elif placing_flag == 2:
                 self.is_flagged = True
                 self.is_covered = False
@@ -114,45 +117,7 @@ class Tile:
             if placing_flag == 1:
                 self.is_covered = False
                 if is_tile_0(self) == True:
-                    surrounding_tiles_list = find_surounding_tiles(self)
-                    for tile in surrounding_tiles_list:
-                        tile.is_covered = False
-                        if is_tile_0(tile):
-                            surrounding_tiles_list_2 = find_surounding_tiles(tile)
-                            for tile2 in surrounding_tiles_list_2:
-                                tile2.is_covered = False
-                                if is_tile_0(tile2):
-                                    surrounding_tiles_list_3 = find_surounding_tiles(tile2)
-                                    for tile3 in surrounding_tiles_list_3:
-                                        tile3.is_covered = False
-                                        if is_tile_0(tile3):
-                                            surrounding_tiles_list_4 = find_surounding_tiles(tile3)
-                                            for tile4 in surrounding_tiles_list_4:
-                                                tile4.is_covered = False
-                                                if is_tile_0(tile4):
-                                                    surrounding_tiles_list_5 = find_surounding_tiles(tile4)
-                                                    for tile5 in surrounding_tiles_list_5:
-                                                        tile5.is_covered = False
-                                                        if is_tile_0(tile5):
-                                                            surrounding_tiles_list_6 = find_surounding_tiles(tile5)
-                                                            for tile6 in surrounding_tiles_list_6:
-                                                                tile6.is_covered = False
-                                                                if is_tile_0(tile6):
-                                                                    surrounding_tiles_list_7 = find_surounding_tiles(tile6)
-                                                                    for tile7 in surrounding_tiles_list_7:
-                                                                        tile7.is_covered = False
-                                                                        if is_tile_0(tile7):
-                                                                            surrounding_tiles_list_8 = find_surounding_tiles(tile7)
-                                                                            for tile8 in surrounding_tiles_list_8:
-                                                                                tile8.is_covered = False
-                                                                                if is_tile_0(tile8):
-                                                                                    surrounding_tiles_list_9 = find_surounding_tiles(tile8)
-                                                                                    for tile9 in surrounding_tiles_list_9:
-                                                                                        tile9.is_covered = False
-                                                                                        if is_tile_0(tile9):
-                                                                                            surrounding_tiles_list_10 = find_surounding_tiles(tile9)
-                                                                                            for tile10 in surrounding_tiles_list_10:
-                                                                                                tile10.is_covered = False
+                    find_surrounding_0s(self, 6)
 
             elif placing_flag == 2:
                 if can_remove_flag == True:
@@ -160,32 +125,46 @@ class Tile:
                     self.is_flagged = True
                 else:
                     print("YOU LOSE: FLAGGED CLEAR TILE")
-                    print("Your Score is: " + str(uncovered_count + turn))
-                    for tile in tile_list:
-                        if tile.is_bomb == True:
-                            print("Mines were at: " + str(tile.position_y) + ", " + str(tile.position_x))
-                    exit()
+                    end_game()
             elif placing_flag == 3:
                 self.is_flagged = False
                 self.is_covered = True
                    
             print(show_board())
             new_pick()
-
+    #picks new bombs if your first tile was a bomb
     def pick_new_bomb(self):
-        print("IT PICKING")
         global bomb_list
         self.is_bomb = False
         bomb_list = []
-        select_turn_mines()
+        select_bombs(num_of_bombs, tile_list)
 
+    #finds the number the tile should be
     def find_surrounding_bomb_for_tile(self):
         bomb_count = 1
         for tile in surrounding_tiles[self]:
             if tile.is_bomb:
                 bomb_count += 1
         return str(bomb_count - 1)
+#ends the game
+def end_game():
+    print("Your Score is: " + str(uncovered_count + turn))
+    for bomb in tile_list:
+        if bomb.is_bomb == True:
+            print("Mines were at: " + str(bomb.position_y) + ", " + str(bomb.position_x))
+    print(bomb_list)
+    exit()
 
+#Finds the tiles around it that are 0, is used in the mass clearing of 0s
+def find_surrounding_0s(tile, i):
+    if i != 0:
+        surounding_tiles = find_surounding_tiles(tile)
+        for tile1 in surounding_tiles:
+            tile1.is_covered = False
+            if is_tile_0(tile1) == True:
+                find_surrounding_0s(tile1, i-1)
+    
+#checks is a tile is 0
 def is_tile_0(tile):
     bomb_count = 0
     for tile in surrounding_tiles[tile]:
@@ -196,12 +175,14 @@ def is_tile_0(tile):
     else:
         return False
 
+#finds all the suroundings tiles
 def find_surounding_tiles(self):
     return_list = []
     for tile in surrounding_tiles[self]:
         return_list.append(tile)
     return return_list
 
+#does the mass clearing of 0s
 def uncover_0_field(tile):
     global uncover_0_count
     print(uncover_0_count)
@@ -218,7 +199,7 @@ def uncover_0_field(tile):
     else:
         return return_list
 
-
+#sets of the tiles cords
 tile1 = Tile(1, 1)
 tile2 = Tile(1, 2)
 tile3 = Tile(1, 3)
@@ -246,7 +227,7 @@ tile24 = Tile(5, 4)
 tile25 = Tile(5, 5)
 
 
-
+#the list of all tiles
 tile_list = [
          tile1,tile2,tile3,tile4,tile5,
          tile6,tile7,tile8,tile9,tile10,
@@ -255,6 +236,7 @@ tile_list = [
          tile21,tile22,tile23,tile24,tile25
         ]
 
+#a dict with all surounding tiles
 surrounding_tiles = {tile1: [tile2, tile7, tile6], 
                      tile2: [tile1, tile3, tile6, tile7, tile8], 
                      tile3:[tile2, tile4, tile7, tile8, tile9], 
@@ -280,18 +262,24 @@ surrounding_tiles = {tile1: [tile2, tile7, tile6],
                      tile23: [tile17, tile18, tile19, tile22, tile24],
                      tile24: [tile18, tile19, tile20, tile23, tile25],
                      tile25: [tile19, tile20, tile24]}
+
+
 bomb_list = []
-def select_turn_mines():
-    global bomb_list
-    while len(bomb_list) <= num_of_bombs:
-        new_bomb = tile_list[random.randint(0, 24)]
-        bomb_list.append(tile_list.index(new_bomb) + 1)
-        for bomb in bomb_list:
-            if tile_list.index(new_bomb) + 1 != bomb:
-                new_bomb.is_bomb = True
+for tile in tile_list:
+    if tile.is_bomb == True:
+        bomb_list.append(tile)
+#selects bombs
+def select_bombs(bomb_count, tlist):
+    if bomb_count != 0:
+        new_bomb = tlist[random.randint(0, 24)]
+        if new_bomb.is_bomb == True:
+            select_bombs(bomb_count, tlist)
+        else:
+            new_bomb.is_bomb = True
+            select_bombs(bomb_count - 1, tlist)
+select_bombs(num_of_bombs, tile_list)
 
-select_turn_mines()
-
+#board
 def show_board():
     board = """
 Turn: {turn}
@@ -329,7 +317,7 @@ Turn: {turn}
   tile24=tile24,
   tile25=tile25)
     return board
-
+#starts game
 turn  += 1
 x_input_list = [0]
 y_input_list = [0]
