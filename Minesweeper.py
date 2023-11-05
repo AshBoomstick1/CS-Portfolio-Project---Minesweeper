@@ -345,31 +345,22 @@ def select_bombs(bomb_count):
 select_bombs(num_of_bombs)
 
 #def select_mines()
-
-
-def print_boardd():
-    def print_top_row():
-        return_string = " 0 "
-        for col in range(1, col_count + 1):
-            return_string += "  {col} ".format(col=col)
-        return return_string + " X\n"
-    print(print_top_row())
-    for row in range(1, row_count + 1):
-        def print_rows():
-            return_string = " {row} ".format(row=row)
-            for col in range(1, col_count + 1):
-                i = cal_id(row, 0, col, 0)
-                return_string += " [{n}]".format(n=tile_pos_dict[i][1])
-            print(return_string + " \n")
-        print_rows()
-    print(" Y\n")    
+  
 
 def print_board():
     def print_top_row():
-        col_list = [str(num) for num in range(0, col_count + 1) ]
+        def print_0():
+            start_list = ""
+            for num in range(len(str(row_count)) - 1):
+                start_list += (" ")
+            start_list += (" 0   ")
+            return start_list
+        col_list = [str(num) for num in range(1, col_count + 1) ]
         new_list = []
         for num in col_list:
-            if len(num) == 1:
+            if num == 1:
+                new_list.append("  " + num + "  ")
+            elif len(num) == 1:
                 new_list.append(" " + num + "  ")
             elif len(num) == 2:
                 new_list.append(num + "  ")
@@ -382,17 +373,25 @@ def print_board():
         for item in new_list:
             return_string += item
 
-        return return_string + " X\n"
+        col_string = "\x1B[4m{return_s} \x1B[0m X \n".format(return_s=return_string)
+        return print_0() + col_string
+    
     print(print_top_row())
     for row in range(1, row_count + 1):
         def print_rows():
-            return_string = " {row} ".format(row=row)
+            return_string = ""
+            if row < 10:
+                    return_string += " "
+            return_string += " {row} | ".format(row=row)
             for col in range(1, col_count + 1):
                 i = cal_id(row, 0, col, 0)
-                return_string += " [{n}]".format(n=tile_pos_dict[i][1])
-            print(return_string + " \n")
+                if row == row_count:
+                    return_string += "\x1B[4m  {n} \x1B[0m".format(n=tile_pos_dict[i][1])
+                else:
+                    return_string += "  {n} ".format(n=tile_pos_dict[i][1])
+            print(return_string + " |\n")
         print_rows()
-    print(" Y\n")
+    print(" Y\n\n\n\n")
 
 #starts game
 turn  += 1
