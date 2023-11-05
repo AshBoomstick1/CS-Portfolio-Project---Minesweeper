@@ -2,14 +2,27 @@ import random
 import math
 import datetime
 #Sets of the game
+
+def represents_int(s):
+    try: 
+        int(s)
+    except ValueError:
+        return False
+    else:
+        return True
+    
 placing_flag = 2
 tile_num = int(input("\nHow many tiles in the grid?: "))
+while represents_int(tile_num) == False:
+    tile_num = int(input("\nEnter an integer for the total number of tiles in the grid: "))
 can_remove_flag = input("\nDo want to be able to remove flag? (y/n): ")
 if can_remove_flag == "y":
     can_remove_flag = True
 else:
     can_remove_flag = False
-num_of_bombs = int(input("\nNumber of mines:"))
+num_of_bombs = int(input("\nNumber of mines:")) + 1
+while represents_int(num_of_bombs) == False:
+    num_of_bombs = int(input("\nEnter an integer for the number of mines: ")) + 1
 if can_remove_flag == True:
     num_of_bombs += 1
 turn = -1
@@ -80,12 +93,8 @@ class Tile:
         un_cover_again = False
         if can_remove_flag == False:
             input_flag = input("Add flag or uncover tile? (1 to uncover, 2 to flag):")
-            while type(input_flag) != str or input_flag == "":
-                input_flag = input("Type 1 to uncover tile. Type 2 to place flag:")
         else:
             input_flag = input("Add flag, remove flag, or uncover tile? (1 to uncover, 2 to flag, 3 to remove flag):")
-            while type(input_flag) != str or input_flag == "":
-                input_flag = input("Type 1 to uncover tile. Type 2 to place flag. Type 3 to remove flag:")
         if int(input_flag) == 2:
             global placing_flag
             placing_flag = 2
@@ -137,16 +146,30 @@ class Tile:
             print(print_board())
             new_pick()
 
+    def recover(self):
+        self.is_covered = True
+
+    def unflag(self):
+        self.is_flagged = False
+
+    def decover(self):
+        self.is_covered = False
+
     #picks new bombs if your first tile was a bomb
     def pick_new_bomb(self):
         global bomb_list
         self.is_bomb = False
         bomb_list = []
-        remaining_list = [tile_dict[tile] for tile in tile_dict]
-        select_bombs(num_of_bombs, remaining_list)
+        select_bombs(num_of_bombs)
     
     def check(self):
         self.is_checked == True
+
+    def uncheck(self):
+        self.is_checked = False
+
+    def remove_mine(self):
+        self.is_bomb = False
 
 #finds the number the tile should be
 def find_surrounding_bomb_for_tile(current_tile):
@@ -160,10 +183,11 @@ def find_surrounding_bomb_for_tile(current_tile):
 #ends the game
 def end_game():
     print("Your Score is: " + str(uncovered_count + turn))
+    print("Mines were at: ")
     for bomb in tile_list:
         if bomb.is_bomb == True:
-            print("Mines were at: " + str(bomb.position_y) + ", " + str(bomb.position_x))
-    exit()
+            print(" " + str(bomb.position_y) + ", " + str(bomb.position_x))
+    play_again()
 
 #Finds the tiles around it that are 0, is used in the mass clearing of 0s
 
@@ -172,7 +196,7 @@ def find_surrounding_0s(tile):
         stile = tile_pos_dict[str(tile_pos)][1]
         if stile.is_checked == False:
             stile.is_checked = True
-            stile.is_covered = False
+            stile.decover()
             if is_tile_0(stile):
                 find_surrounding_0s(stile)
 
@@ -259,6 +283,7 @@ def find_factors(n):
         
 tile_dict = {}
 tile_pos_dict = {}
+remaining_dict = {}
 def make_tiles(num_of_tiles):
     global row_count
     global col_count
@@ -271,6 +296,7 @@ def make_tiles(num_of_tiles):
             tile_num += 1
             var_name = "tile" + str(tile_num)
             tile_dict[var_name] = Tile(row + 1, col + 1, cal_id(row + 1, 0, col + 1, 0))
+            remaining_dict[var_name] = Tile(row + 1, col + 1, cal_id(row + 1, 0, col + 1, 0))
     for item in tile_dict:
         tile_pos_dict["{x}{y}".format(x=tile_dict[item].position_x, y=tile_dict[item].position_y)] = [item, tile_dict[item]]
 
@@ -307,32 +333,21 @@ def find_surrounding_tiles():
 
 find_surrounding_tiles()
 tile_list = [tile_dict[tile] for tile in tile_dict]
-
-
-bomb_list = []
-for tile in tile_list:
-    if tile.is_bomb == True:
-        bomb_list.append(tile)
         
 #selects bombs
-def select_bombs(bomb_count, tlist):
-    if bomb_count != 0:
-        new_bomb = tlist[random.randint(0, len(remaining_list)) - 1]
-        if new_bomb.is_bomb == True:
-            select_bombs(bomb_count, remaining_list)
-        else:
-            new_bomb.is_bomb = True
-            tlist.pop(tlist.index(new_bomb))
-            select_bombs(bomb_count - 1, tlist)
-remaining_list = [tile_dict[tile] for tile in tile_dict]            
-select_bombs(num_of_bombs, remaining_list)
+def select_bombs(bomb_count):
+    remaining_list = [tile_dict[tile] for tile in tile_dict]
+    for bomb in range(1, bomb_count):
+        new_bomb = int(random.randint(1, len(remaining_list)) - 1)
+        tile_list[new_bomb].is_bomb = True
+        remaining_list.pop(new_bomb)
 
-
+select_bombs(num_of_bombs)
 
 #def select_mines()
 
 
-def print_board():
+def print_boardd():
     def print_top_row():
         return_string = " 0 "
         for col in range(1, col_count + 1):
@@ -349,9 +364,37 @@ def print_board():
         print_rows()
     print(" Y\n")    
 
+def print_board():
+    def print_top_row():
+        col_list = [str(num) for num in range(0, col_count + 1) ]
+        new_list = []
+        for num in col_list:
+            if len(num) == 1:
+                new_list.append(" " + num + "  ")
+            elif len(num) == 2:
+                new_list.append(num + "  ")
+            elif len(num) == 3:
+                new_list.append(num + " ")
+            else:
+                new_list.append(num)
+
+        return_string = ""
+        for item in new_list:
+            return_string += item
+
+        return return_string + " X\n"
+    print(print_top_row())
+    for row in range(1, row_count + 1):
+        def print_rows():
+            return_string = " {row} ".format(row=row)
+            for col in range(1, col_count + 1):
+                i = cal_id(row, 0, col, 0)
+                return_string += " [{n}]".format(n=tile_pos_dict[i][1])
+            print(return_string + " \n")
+        print_rows()
+    print(" Y\n")
 
 #starts game
-start_time = datetime.datetime.now()
 turn  += 1
 x_input_list = [0]
 y_input_list = [0]
@@ -360,29 +403,40 @@ def new_pick():
     global turn
     uncovered_count = 0
     uncovered_tile_count = 0
+    bomb_count = 0
     for tile in tile_list:
         if tile.is_covered == False:
             uncovered_count += 1
+        if tile.is_bomb == True:
+            bomb_count += 1
     for tile in tile_list:
         if tile.is_covered == False and tile.is_bomb == False:
             uncovered_tile_count += 1
-    if uncovered_count == len(tile_dict) or uncovered_tile_count == len(tile_dict) - num_of_bombs:
+    if uncovered_tile_count >= len(tile_dict) - bomb_count :
         end_time = datetime.datetime.now()
+        global start_time
         time = str(end_time - start_time)
         time = time[2:7]
         print("YOU WIN!")
         print("YOU WON IN {time} with {turn} TURNS".format(time=time, turn=turn))
+        play_again()
     else:
 
         input_cord_x = input("Enter the X cord of the tile you want to uncover: ")
-        while type(input_cord_x) != str or input_cord_x == "" or int(input_cord_x) < 1 or int(input_cord_x) > col_count:
-            input_cord_x = input("Enter a number between 0 and 6 as your X cord: ") 
+        while represents_int(input_cord_x) == False:
+            input_cord_x = input("Enter an integer between 0 and 6 as your X cord: ")
+        if int(input_cord_x) > col_count:
+            input_cord_x = input("Enter an integer between 0 and 6 as your X cord: ")
+
+            
 
         x_input_list.append(input_cord_x)
 
         input_cord_y = input("Enter the Y cord of the tile you want to uncover: ")  
-        while input_cord_y == "" or int(input_cord_y) < 1 or int(input_cord_y) > row_count:
-            input_cord_y = input("Enter a number between 0 and 6 as your Y cord: ")
+        while represents_int(input_cord_y) == False:
+            input_cord_y = input("Enter an integer between 0 and 6 as your Y cord: ")
+        if int(input_cord_y) > row_count:
+            input_cord_y = input("Enter an integer between 0 and 6 as your Y cord: ")
 
         y_input_list.append(input_cord_y)
 
@@ -390,6 +444,22 @@ def new_pick():
             if tile.position_y == int(input_cord_x) and tile.position_x == int(input_cord_y):
                 tile.uncover()
 
+def play_again():
+    redo = input("Play again? (y/n): ")
+    if redo == "y":
+        turn = 0
+        for tile in tile_list:
+            tile.recover()
+            tile.unflag()
+            tile.uncheck()
+            tile.remove_mine()
+        select_bombs(num_of_bombs - 1)
+        print(print_board())
+        start_time = datetime.datetime.now()
+        new_pick()
+    else:
+        exit()
 
 print(print_board())
+start_time = datetime.datetime.now()
 new_pick()
